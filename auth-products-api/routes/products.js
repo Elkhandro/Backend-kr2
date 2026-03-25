@@ -1,6 +1,7 @@
 const express = require("express");
 const { nanoid } = require("nanoid");
 const { products } = require("../data");
+const authMiddleware = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -18,7 +19,7 @@ const findProductById = (id, res) => {
  * @swagger
  * /api/products:
  *   post:
- *     summary: Создать новый товар
+ *     summary: Создать новый товар (открытый маршрут)
  *     tags: [Products]
  *     requestBody:
  *       required: true
@@ -77,7 +78,7 @@ router.post("/", (req, res) => {
  * @swagger
  * /api/products:
  *   get:
- *     summary: Получить список всех товаров
+ *     summary: Получить список всех товаров (открытый маршрут)
  *     tags: [Products]
  *     responses:
  *       200:
@@ -91,8 +92,10 @@ router.get("/", (req, res) => {
  * @swagger
  * /api/products/{id}:
  *   get:
- *     summary: Получить товар по id
+ *     summary: Получить товар по id (защищённый маршрут)
  *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -102,10 +105,12 @@ router.get("/", (req, res) => {
  *     responses:
  *       200:
  *         description: Товар найден
+ *       401:
+ *         description: Не авторизован
  *       404:
  *         description: Товар не найден
  */
-router.get("/:id", (req, res) => {
+router.get("/:id", authMiddleware, (req, res) => {
   const product = findProductById(req.params.id, res);
   if (product) {
     res.status(200).json(product);
@@ -116,8 +121,10 @@ router.get("/:id", (req, res) => {
  * @swagger
  * /api/products/{id}:
  *   put:
- *     summary: Обновить параметры товара
+ *     summary: Обновить параметры товара (защищённый маршрут)
  *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -142,10 +149,12 @@ router.get("/:id", (req, res) => {
  *     responses:
  *       200:
  *         description: Товар обновлён
+ *       401:
+ *         description: Не авторизован
  *       404:
  *         description: Товар не найден
  */
-router.put("/:id", (req, res) => {
+router.put("/:id", authMiddleware, (req, res) => {
   const product = findProductById(req.params.id, res);
   if (!product) return;
 
@@ -170,8 +179,10 @@ router.put("/:id", (req, res) => {
  * @swagger
  * /api/products/{id}:
  *   delete:
- *     summary: Удалить товар
+ *     summary: Удалить товар (защищённый маршрут)
  *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -181,10 +192,12 @@ router.put("/:id", (req, res) => {
  *     responses:
  *       200:
  *         description: Товар удалён
+ *       401:
+ *         description: Не авторизован
  *       404:
  *         description: Товар не найден
  */
-router.delete("/:id", (req, res) => {
+router.delete("/:id", authMiddleware, (req, res) => {
   const index = products.findIndex((p) => p.id === req.params.id);
   if (index === -1) {
     return res.status(404).json({ error: "Товар не найден" });

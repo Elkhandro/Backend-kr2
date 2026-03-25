@@ -8,6 +8,12 @@ const productsRoutes = require("./routes/products");
 const app = express();
 const port = 3000;
 
+// JWT конфигурация
+const JWT_SECRET = "your-secret-key-change-this-in-production";
+const ACCESS_EXPIRES_IN = "15m";
+app.set("JWT_SECRET", JWT_SECRET);
+app.set("ACCESS_EXPIRES_IN", ACCESS_EXPIRES_IN);
+
 app.use(express.json());
 
 // Swagger конфигурация
@@ -25,6 +31,15 @@ const swaggerOptions = {
         description: "Локальный сервер",
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
   },
   apis: ["./routes/*.js"],
 };
