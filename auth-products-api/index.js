@@ -9,10 +9,14 @@ const app = express();
 const port = 3000;
 
 // JWT конфигурация
-const JWT_SECRET = "your-secret-key-change-this-in-production";
+const ACCESS_SECRET = "access_secret_key_change_in_production";
+const REFRESH_SECRET = "refresh_secret_key_change_in_production";
 const ACCESS_EXPIRES_IN = "15m";
-app.set("JWT_SECRET", JWT_SECRET);
+const REFRESH_EXPIRES_IN = "7d";
+app.set("ACCESS_SECRET", ACCESS_SECRET);
+app.set("REFRESH_SECRET", REFRESH_SECRET);
 app.set("ACCESS_EXPIRES_IN", ACCESS_EXPIRES_IN);
+app.set("REFRESH_EXPIRES_IN", REFRESH_EXPIRES_IN);
 
 app.use(express.json());
 
