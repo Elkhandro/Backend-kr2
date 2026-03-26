@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 
 function authMiddleware(req, res, next) {
   const header = req.headers.authorization || "";
-
   const [scheme, token] = header.split(" ");
 
   if (scheme !== "Bearer" || !token) {
@@ -19,7 +18,15 @@ function authMiddleware(req, res, next) {
     const ACCESS_SECRET = req.app.get("ACCESS_SECRET");
     const payload = jwt.verify(token, ACCESS_SECRET);
 
-    req.user = payload;
+    // Сохраняем данные пользователя, включая роль
+    req.user = {
+      id: payload.sub,
+      email: payload.email,
+      first_name: payload.first_name,
+      last_name: payload.last_name,
+      role: payload.role || "user", // если роль не указана, по умолчанию user
+    };
+
     next();
   } catch (err) {
     if (err.name === "TokenExpiredError") {

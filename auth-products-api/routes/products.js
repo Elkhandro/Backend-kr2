@@ -2,6 +2,7 @@ const express = require("express");
 const { nanoid } = require("nanoid");
 const { products } = require("../data");
 const authMiddleware = require("../middleware/auth");
+const roleMiddleware = require("../middleware/roles");
 
 const router = express.Router();
 
@@ -47,32 +48,37 @@ const findProductById = (id, res) => {
  *       400:
  *         description: Не указаны обязательные поля
  */
-router.post("/", (req, res) => {
-  const { title, category, description, price } = req.body;
+router.post(
+  "/",
+  authMiddleware,
+  roleMiddleware(["seller", "admin"]),
+  (req, res) => {
+    const { title, category, description, price } = req.body;
 
-  if (!title || !category || !description || price === undefined) {
-    return res.status(400).json({
-      error: "Все поля обязательны: title, category, description, price",
-    });
-  }
+    if (!title || !category || !description || price === undefined) {
+      return res.status(400).json({
+        error: "Все поля обязательны: title, category, description, price",
+      });
+    }
 
-  if (typeof price !== "number" || price <= 0) {
-    return res
-      .status(400)
-      .json({ error: "Price должен быть положительным числом" });
-  }
+    if (typeof price !== "number" || price <= 0) {
+      return res
+        .status(400)
+        .json({ error: "Price должен быть положительным числом" });
+    }
 
-  const newProduct = {
-    id: nanoid(),
-    title,
-    category,
-    description,
-    price,
-  };
+    const newProduct = {
+      id: nanoid(),
+      title,
+      category,
+      description,
+      price,
+    };
 
-  products.push(newProduct);
-  res.status(201).json(newProduct);
-});
+    products.push(newProduct);
+    res.status(201).json(newProduct);
+  },
+);
 
 /**
  * @swagger
@@ -84,8 +90,8 @@ router.post("/", (req, res) => {
  *       200:
  *         description: Список товаров
  */
-router.get("/", (req, res) => {
-  res.status(200).json(products);
+router.get("/", authMiddleware, (req, res) => {
+  res.json(products);
 });
 
 /**
@@ -112,9 +118,7 @@ router.get("/", (req, res) => {
  */
 router.get("/:id", authMiddleware, (req, res) => {
   const product = findProductById(req.params.id, res);
-  if (product) {
-    res.status(200).json(product);
-  }
+  if (product) res.json(product);
 });
 
 /**
@@ -154,26 +158,31 @@ router.get("/:id", authMiddleware, (req, res) => {
  *       404:
  *         description: Товар не найден
  */
-router.put("/:id", authMiddleware, (req, res) => {
-  const product = findProductById(req.params.id, res);
-  if (!product) return;
+router.put(
+  "/:id",
+  authMiddleware,
+  roleMiddleware(["seller", "admin"]),
+  (req, res) => {
+    const product = findProductById(req.params.id, res);
+    if (!product) return;
 
-  const { title, category, description, price } = req.body;
+    const { title, category, description, price } = req.body;
 
-  if (title !== undefined) product.title = title;
-  if (category !== undefined) product.category = category;
-  if (description !== undefined) product.description = description;
-  if (price !== undefined) {
-    if (typeof price !== "number" || price <= 0) {
-      return res
-        .status(400)
-        .json({ error: "Price должен быть положительным числом" });
+    if (title !== undefined) product.title = title;
+    if (category !== undefined) product.category = category;
+    if (description !== undefined) product.description = description;
+    if (price !== undefined) {
+      if (typeof price !== "number" || price <= 0) {
+        return res
+          .status(400)
+          .json({ error: "Price должен быть положительным числом" });
+      }
+      product.price = price;
     }
-    product.price = price;
-  }
 
-  res.status(200).json(product);
-});
+    res.json(product);
+  },
+);
 
 /**
  * @swagger
@@ -197,14 +206,14 @@ router.put("/:id", authMiddleware, (req, res) => {
  *       404:
  *         description: Товар не найден
  */
-router.delete("/:id", authMiddleware, (req, res) => {
+router.delete("/:id", authMiddleware, roleMiddleware(["admin"]), (req, res) => {
   const index = products.findIndex((p) => p.id === req.params.id);
   if (index === -1) {
     return res.status(404).json({ error: "Товар не найден" });
   }
 
   products.splice(index, 1);
-  res.status(200).json({ message: "Товар успешно удалён" });
+  res.json({ message: "Товар успешно удалён" });
 });
 
 module.exports = router;

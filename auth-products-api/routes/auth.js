@@ -105,6 +105,7 @@ router.post("/register", async (req, res) => {
     first_name,
     last_name,
     password: hashedPassword,
+    role: "user",
   };
 
   users.push(newUser);
@@ -184,6 +185,7 @@ router.post("/login", async (req, res) => {
       email: user.email,
       first_name: user.first_name,
       last_name: user.last_name,
+      role: user.role,
     },
     ACCESS_SECRET,
     {
@@ -196,6 +198,7 @@ router.post("/login", async (req, res) => {
     {
       sub: user.id,
       email: user.email,
+      role: user.role,
     },
     REFRESH_SECRET,
     {

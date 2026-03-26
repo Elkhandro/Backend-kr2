@@ -5,6 +5,7 @@ const swaggerUi = require("swagger-ui-express");
 
 const authRoutes = require("./routes/auth");
 const productsRoutes = require("./routes/products");
+const usersRoutes = require("./routes/users");
 
 const app = express();
 const port = 3000;
@@ -65,6 +66,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Подключаем маршруты
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productsRoutes);
+app.use("/api/users", usersRoutes);
 
 // Добавляем корневой маршрут
 app.get("/", (req, res) => {
