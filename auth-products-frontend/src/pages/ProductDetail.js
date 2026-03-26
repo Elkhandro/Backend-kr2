@@ -6,7 +6,6 @@ const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,8 +16,8 @@ const ProductDetail = () => {
     try {
       const response = await apiClient.get(`/products/${id}`);
       setProduct(response.data);
-    } catch (err) {
-      setError("Товар не найден");
+    } catch (error) {
+      console.error("Error:", error);
     } finally {
       setLoading(false);
     }
@@ -29,29 +28,29 @@ const ProductDetail = () => {
     try {
       await apiClient.delete(`/products/${id}`);
       navigate("/products");
-    } catch (err) {
+    } catch (error) {
       alert("Ошибка удаления");
     }
   };
 
   if (loading) return <div style={styles.loading}>Загрузка...</div>;
-  if (error) return <div style={styles.error}>{error}</div>;
+  if (!product) return <div>Товар не найден</div>;
 
   return (
     <div style={styles.container}>
-      <Link to="/products" style={styles.backBtn}>
-        ← Назад к списку
+      <Link to="/products" style={styles.back}>
+        ← Назад
       </Link>
       <div style={styles.card}>
         <h2>{product.title}</h2>
-        <p style={styles.category}>Категория: {product.category}</p>
-        <p style={styles.description}>{product.description}</p>
-        <p style={styles.price}>Цена: {product.price} ₽</p>
+        <p>Категория: {product.category}</p>
+        <p>{product.description}</p>
+        <p style={styles.price}>{product.price} ₽</p>
         <div style={styles.buttons}>
-          <Link to={`/products/${id}/edit`} style={styles.editBtn}>
+          <Link to={`/products/${id}/edit`} style={styles.edit}>
             Редактировать
           </Link>
-          <button onClick={handleDelete} style={styles.deleteBtn}>
+          <button onClick={handleDelete} style={styles.delete}>
             Удалить
           </button>
         </div>
@@ -61,67 +60,37 @@ const ProductDetail = () => {
 };
 
 const styles = {
-  container: {
-    maxWidth: "800px",
-    margin: "0 auto",
-    padding: "1rem",
-  },
-  backBtn: {
+  container: { maxWidth: "800px", margin: "0 auto", padding: "1rem" },
+  back: {
     display: "inline-block",
     marginBottom: "1rem",
     color: "#007bff",
     textDecoration: "none",
   },
-  card: {
-    border: "1px solid #ddd",
-    borderRadius: "8px",
-    padding: "2rem",
-    backgroundColor: "white",
-  },
-  category: {
-    color: "#666",
-    marginBottom: "1rem",
-  },
-  description: {
-    marginBottom: "1rem",
-    lineHeight: "1.6",
-  },
+  card: { border: "1px solid #ddd", borderRadius: "8px", padding: "2rem" },
   price: {
     fontSize: "1.5rem",
     fontWeight: "bold",
     color: "#28a745",
-    marginBottom: "1rem",
+    marginTop: "1rem",
   },
-  buttons: {
-    display: "flex",
-    gap: "1rem",
-  },
-  editBtn: {
-    padding: "0.5rem 1rem",
-    backgroundColor: "#ffc107",
+  buttons: { display: "flex", gap: "1rem", marginTop: "1rem" },
+  edit: {
+    background: "#ffc107",
     color: "black",
+    padding: "0.5rem 1rem",
     textDecoration: "none",
     borderRadius: "4px",
   },
-  deleteBtn: {
-    padding: "0.5rem 1rem",
-    backgroundColor: "#dc3545",
+  delete: {
+    background: "#dc3545",
     color: "white",
     border: "none",
+    padding: "0.5rem 1rem",
     borderRadius: "4px",
     cursor: "pointer",
   },
-  loading: {
-    textAlign: "center",
-    padding: "2rem",
-  },
-  error: {
-    backgroundColor: "#f8d7da",
-    color: "#721c24",
-    padding: "0.75rem",
-    borderRadius: "4px",
-    marginBottom: "1rem",
-  },
+  loading: { textAlign: "center", padding: "2rem" },
 };
 
 export default ProductDetail;

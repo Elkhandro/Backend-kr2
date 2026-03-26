@@ -27,34 +27,30 @@ const Login = () => {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h2>Вход в систему</h2>
+        <h2>Вход</h2>
         {error && <div style={styles.error}>{error}</div>}
         <form onSubmit={handleSubmit}>
-          <div style={styles.formGroup}>
-            <label>Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={styles.input}
-            />
-          </div>
-          <div style={styles.formGroup}>
-            <label>Пароль</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={styles.input}
-            />
-          </div>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={styles.input}
+          />
+          <input
+            type="password"
+            placeholder="Пароль"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={styles.input}
+          />
           <button type="submit" disabled={loading} style={styles.button}>
             {loading ? "Вход..." : "Войти"}
           </button>
         </form>
-        <p style={styles.link}>
+        <p>
           Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
         </p>
       </div>
@@ -73,40 +69,31 @@ const styles = {
     padding: "2rem",
     border: "1px solid #ddd",
     borderRadius: "8px",
-    width: "100%",
-    maxWidth: "400px",
-    backgroundColor: "white",
-  },
-  formGroup: {
-    marginBottom: "1rem",
+    width: "300px",
+    textAlign: "center",
   },
   input: {
     width: "100%",
     padding: "0.5rem",
+    margin: "0.5rem 0",
     border: "1px solid #ddd",
     borderRadius: "4px",
-    fontSize: "1rem",
   },
   button: {
     width: "100%",
-    padding: "0.75rem",
-    backgroundColor: "#007bff",
+    padding: "0.5rem",
+    background: "#007bff",
     color: "white",
     border: "none",
     borderRadius: "4px",
     cursor: "pointer",
-    fontSize: "1rem",
   },
   error: {
-    backgroundColor: "#f8d7da",
+    background: "#f8d7da",
     color: "#721c24",
-    padding: "0.75rem",
+    padding: "0.5rem",
     borderRadius: "4px",
     marginBottom: "1rem",
-  },
-  link: {
-    marginTop: "1rem",
-    textAlign: "center",
   },
 };
 

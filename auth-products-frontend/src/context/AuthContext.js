@@ -17,8 +17,7 @@ export const AuthProvider = ({ children }) => {
           const response = await apiClient.get("/auth/me");
           setUser(response.data);
         } catch (error) {
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
+          localStorage.clear();
         }
       }
       setLoading(false);
@@ -45,23 +44,15 @@ export const AuthProvider = ({ children }) => {
     if (refreshToken) {
       try {
         await apiClient.post("/auth/logout", { refreshToken });
-      } catch (error) {
-        console.error("Logout error:", error);
-      }
+      } catch (error) {}
     }
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    localStorage.clear();
     setUser(null);
   };
 
-  const value = {
-    user,
-    loading,
-    login,
-    register,
-    logout,
-    isAuthenticated: !!user,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
